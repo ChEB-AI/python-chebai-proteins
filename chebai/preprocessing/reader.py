@@ -3,8 +3,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from urllib.error import HTTPError
 
-import deepsmiles
-import selfies as sf
 import torch
 from esm import Alphabet
 from esm.model.esm2 import ESM2
@@ -13,8 +11,6 @@ from esm.pretrained import (
     load_model_and_alphabet_core,
     load_model_and_alphabet_local,
 )
-from pysmiles.read_smiles import _tokenize
-from transformers import RobertaTokenizerFast
 
 from chebai.preprocessing.collate import DefaultCollator, RaggedCollator
 
