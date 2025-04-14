@@ -2,14 +2,16 @@ import csv
 import math
 import os
 import pickle
-from typing import List, Literal, Union
+from typing import List, Literal, Type, Union
 
 import torch
 
 from chebai.loss.bce_weighted import BCEWeighted
 from chebai.preprocessing.datasets import XYBaseDataModule
-from chebai.preprocessing.datasets.chebi import ChEBIOver100, _ChEBIDataExtractor
-from chebai.preprocessing.datasets.pubchem import LabeledUnlabeledMixed
+from chebai.preprocessing.datasets.deepGO.go_uniprot import (
+    GOUniProtOver250,
+    _GOUniProtDataExtractor,
+)
 
 
 class ImplicationLoss(torch.nn.Module):
@@ -17,7 +19,7 @@ class ImplicationLoss(torch.nn.Module):
     Implication Loss module.
 
     Args:
-        data_extractor _ChEBIDataExtractor: Data extractor for labels.
+        data_extractor _GOUniProtDataExtractor: Data extractor for labels.
         base_loss (torch.nn.Module, optional): Base loss function. Defaults to None.
         fuzzy_implication (Literal["product", "lukasiewicz", "xu19"], optional): T-norm type. Defaults to "product".
         impl_loss_weight (float, optional): Weight of implication loss relative to base loss. Defaults to 0.1.
@@ -70,9 +72,7 @@ class ImplicationLoss(torch.nn.Module):
     ):
         super().__init__()
         # automatically choose labeled subset for implication filter in case of mixed dataset
-        if isinstance(data_extractor, LabeledUnlabeledMixed):
-            data_extractor = data_extractor.labeled
-        assert isinstance(data_extractor, _ChEBIDataExtractor)
+        assert isinstance(data_extractor, _GOUniProtDataExtractor)
         self.data_extractor = data_extractor
         # propagate data_extractor to base loss
         if isinstance(base_loss, BCEWeighted):
@@ -329,7 +329,7 @@ class DisjointLoss(ImplicationLoss):
 
     Args:
         path_to_disjointness (str): Path to the disjointness data file (a csv file containing pairs of disjoint classes)
-        data_extractor (Union[_ChEBIDataExtractor, LabeledUnlabeledMixed]): Data extractor for labels.
+        data_extractor (_GOUniProtDataExtractor): Data extractor for labels.
         base_loss (torch.nn.Module, optional): Base loss function. Defaults to None.
         disjoint_loss_weight (float, optional): Weight of disjointness loss. Defaults to 100.
         **kwargs: Additional arguments.
@@ -338,7 +338,7 @@ class DisjointLoss(ImplicationLoss):
     def __init__(
         self,
         path_to_disjointness: str,
-        data_extractor: Union[_ChEBIDataExtractor, LabeledUnlabeledMixed],
+        data_extractor: _GOUniProtDataExtractor,
         base_loss: torch.nn.Module = None,
         disjoint_loss_weight: float = 100,
         **kwargs,
@@ -502,7 +502,7 @@ def _build_disjointness_filter(
 if __name__ == "__main__":
     loss = DisjointLoss(
         os.path.join("data", "disjoint.csv"),
-        ChEBIOver100(chebi_version=231),
+        GOUniProtOver250(),
         base_loss=BCEWeighted(),
         impl_loss_weight=1,
         disjoint_loss_weight=1,

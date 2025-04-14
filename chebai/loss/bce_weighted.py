@@ -1,12 +1,10 @@
 import os
 from typing import Optional
 
-import pandas as pd
 import torch
 
 from chebai.preprocessing.datasets.base import XYBaseDataModule
-from chebai.preprocessing.datasets.chebi import _ChEBIDataExtractor
-from chebai.preprocessing.datasets.pubchem import LabeledUnlabeledMixed
+from chebai.preprocessing.datasets.deepGO.go_uniprot import _GOUniProtDataExtractor
 
 
 class BCEWeighted(torch.nn.BCEWithLogitsLoss):
@@ -29,11 +27,9 @@ class BCEWeighted(torch.nn.BCEWithLogitsLoss):
         **kwargs,
     ):
         self.beta = beta
-        if isinstance(data_extractor, LabeledUnlabeledMixed):
-            data_extractor = data_extractor.labeled
         self.data_extractor = data_extractor
         assert (
-            isinstance(self.data_extractor, _ChEBIDataExtractor)
+            isinstance(self.data_extractor, _GOUniProtDataExtractor)
             or self.data_extractor is None
         )
         super().__init__(**kwargs)
