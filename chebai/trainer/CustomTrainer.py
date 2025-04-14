@@ -9,7 +9,7 @@ from lightning.pytorch.loggers import WandbLogger
 from torch.nn.utils.rnn import pad_sequence
 
 from chebai.loggers.custom import CustomLogger
-from chebai.preprocessing.reader import CLS_TOKEN, ChemDataReader
+from chebai.preprocessing.reader import CLS_TOKEN, ProteinDataReader
 
 log = logging.getLogger(__name__)
 
@@ -99,22 +99,22 @@ class CustomTrainer(Trainer):
         predictions_df.to_csv(save_to)
 
     def _predict_smiles(
-        self, model: LightningModule, smiles: List[str]
+        self, model: LightningModule, sequence: List[str]
     ) -> torch.Tensor:
         """
         Predicts the output for a list of SMILES strings using the model.
 
         Args:
             model: The model to use for predictions.
-            smiles: A list of SMILES strings.
+            sequence: Protein sequence.
 
         Returns:
             A tensor containing the predictions.
         """
-        reader = ChemDataReader()
-        parsed_smiles = [reader._read_data(s) for s in smiles]
+        reader = ProteinDataReader()
+        parsed_sequence = [reader._read_data(s) for s in sequence]
         x = pad_sequence(
-            [torch.tensor(a, device=model.device) for a in parsed_smiles],
+            [torch.tensor(a, device=model.device) for a in parsed_sequence],
             batch_first=True,
         )
         cls_tokens = (
