@@ -55,7 +55,7 @@ class _ProteinPretrainingData(_DynamicDataset, ABC):
             )
 
     # ------------------------------ Phase: Prepare data -----------------------------------
-    def prepare_data(self, *args: Any, **kwargs: Any) -> None:
+    def _perform_data_preparation(self, *args: Any, **kwargs: Any) -> None:
         """
         Prepares the data by downloading and parsing Swiss-Prot data if not already available. Saves the processed data
         for further use.

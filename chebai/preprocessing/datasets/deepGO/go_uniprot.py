@@ -770,7 +770,7 @@ class _DeepGOMigratedData(_GOUniProtDataExtractor, ABC):
         return f"{threshold_part}{self.max_sequence_length}"
 
     # ------------------------------ Phase: Prepare data -----------------------------------
-    def prepare_data(self, *args: Any, **kwargs: Any) -> None:
+    def _perform_data_preparation(self, *args: Any, **kwargs: Any) -> None:
         """
         Checks for the existence of migrated DeepGO data in the specified directory.
         Raises an error if the required data file is not found, prompting
