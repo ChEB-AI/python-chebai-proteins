@@ -9,8 +9,6 @@ import networkx as nx
 import pandas as pd
 import torch
 from Bio import SwissProt
-from sklearn.model_selection import train_test_split
-
 from chebai.preprocessing.datasets.base import _DynamicDataset
 from chebai.preprocessing.datasets.deepGO.go_uniprot import (
     AMBIGUOUS_AMINO_ACIDS,
@@ -18,6 +16,7 @@ from chebai.preprocessing.datasets.deepGO.go_uniprot import (
     GOUniProtOver250,
 )
 from chebai.preprocessing.reader import ProteinDataReader
+from sklearn.model_selection import train_test_split
 
 
 class _ProteinPretrainingData(_DynamicDataset, ABC):

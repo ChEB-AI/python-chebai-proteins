@@ -3,10 +3,9 @@ from collections import OrderedDict
 from typing import List, Literal, Optional, Tuple
 
 import pandas as pd
+from chebai.preprocessing.datasets.deepGO.go_uniprot import DeepGO1MigratedData
 from iterstrat.ml_stratifiers import MultilabelStratifiedShuffleSplit
 from jsonargparse import CLI
-
-from chebai.preprocessing.datasets.deepGO.go_uniprot import DeepGO1MigratedData
 
 
 class DeepGo1DataMigration:

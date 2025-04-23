@@ -23,7 +23,6 @@ import pandas as pd
 import requests
 import torch
 from Bio import SeqIO
-
 from chebai.preprocessing.datasets.base import _DynamicDataset
 from chebai.preprocessing.reader import ProteinDataReader
 

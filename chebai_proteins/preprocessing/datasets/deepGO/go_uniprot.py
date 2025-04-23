@@ -42,28 +42,18 @@ import requests
 import torch
 import tqdm
 from Bio import SwissProt
-
 from chebai.preprocessing import reader as dr
 from chebai.preprocessing.datasets.base import _DynamicDataset
 
+# fmt: off
 # https://github.com/bio-ontology-research-group/deepgo/blob/master/utils.py#L15
 EXPERIMENTAL_EVIDENCE_CODES = {
-    "EXP",
-    "IDA",
-    "IPI",
-    "IMP",
-    "IGI",
-    "IEP",
-    "TAS",
-    "IC",
+    "EXP", "IDA", "IPI", "IMP", "IGI", "IEP", "TAS", "IC",
     # New evidence codes added in latest paper year 2024 Reference number 3
     # https://github.com/bio-ontology-research-group/deepgo2/blob/main/deepgo/utils.py#L24-L26
-    "HTP",
-    "HDA",
-    "HMP",
-    "HGI",
-    "HEP",
+    "HTP", "HDA", "HMP", "HGI", "HEP",
 }
+# fmt: on
 
 # https://github.com/bio-ontology-research-group/deepgo/blob/d97447a05c108127fee97982fd2c57929b2cf7eb/aaindex.py#L8
 # https://github.com/bio-ontology-research-group/deepgo2/blob/main/deepgo/aminoacids.py#L10

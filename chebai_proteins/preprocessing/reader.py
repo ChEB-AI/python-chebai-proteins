@@ -4,6 +4,8 @@ from typing import List, Optional, Tuple
 from urllib.error import HTTPError
 
 import torch
+from chebai.preprocessing.collate import RaggedCollator
+from chebai.preprocessing.reader import EMBEDDING_OFFSET, DataReader
 from esm import Alphabet
 from esm.model.esm2 import ESM2
 from esm.pretrained import (
@@ -11,9 +13,6 @@ from esm.pretrained import (
     load_model_and_alphabet_core,
     load_model_and_alphabet_local,
 )
-
-from chebai.preprocessing.collate import RaggedCollator
-from chebai.preprocessing.reader import EMBEDDING_OFFSET, DataReader
 
 
 class ProteinDataReader(DataReader):
