@@ -42,8 +42,9 @@ import requests
 import torch
 import tqdm
 from Bio import SwissProt
-from chebai.preprocessing import reader as dr
 from chebai.preprocessing.datasets.base import _DynamicDataset
+
+from chebai_proteins.preprocessing import reader as dr
 
 # fmt: off
 # https://github.com/bio-ontology-research-group/deepgo/blob/master/utils.py#L15

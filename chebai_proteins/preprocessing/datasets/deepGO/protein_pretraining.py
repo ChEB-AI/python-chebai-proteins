@@ -10,13 +10,14 @@ import pandas as pd
 import torch
 from Bio import SwissProt
 from chebai.preprocessing.datasets.base import _DynamicDataset
-from chebai.preprocessing.datasets.deepGO.go_uniprot import (
+from sklearn.model_selection import train_test_split
+
+from chebai_proteins.preprocessing.datasets.deepGO.go_uniprot import (
     AMBIGUOUS_AMINO_ACIDS,
     EXPERIMENTAL_EVIDENCE_CODES,
     GOUniProtOver250,
 )
-from chebai.preprocessing.reader import ProteinDataReader
-from sklearn.model_selection import train_test_split
+from chebai_proteins.preprocessing.reader import ProteinDataReader
 
 
 class _ProteinPretrainingData(_DynamicDataset, ABC):

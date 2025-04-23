@@ -12,7 +12,7 @@ class TestProteinDataReader(unittest.TestCase):
 
     @classmethod
     @patch(
-        "chebai.preprocessing.reader.open",
+        "chebai_proteins.preprocessing.reader.open",
         new_callable=mock_open,
         read_data="M\nK\nT\nF\nR\nN",
     )
