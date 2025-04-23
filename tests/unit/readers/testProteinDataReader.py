@@ -2,7 +2,7 @@ import unittest
 from typing import List
 from unittest.mock import mock_open, patch
 
-from chebai.preprocessing.reader import EMBEDDING_OFFSET, ProteinDataReader
+from chebai_proteins.preprocessing.reader import EMBEDDING_OFFSET, ProteinDataReader
 
 
 class TestProteinDataReader(unittest.TestCase):
