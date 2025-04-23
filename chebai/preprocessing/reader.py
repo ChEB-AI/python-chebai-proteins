@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 from urllib.error import HTTPError
 
 import torch
@@ -13,7 +13,7 @@ from esm.pretrained import (
 )
 
 from chebai.preprocessing.collate import RaggedCollator
-from chebai.preprocessing.reader import DataReader
+from chebai.preprocessing.reader import EMBEDDING_OFFSET, DataReader
 
 
 class ProteinDataReader(DataReader):
