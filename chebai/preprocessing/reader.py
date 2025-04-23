@@ -12,115 +12,8 @@ from esm.pretrained import (
     load_model_and_alphabet_local,
 )
 
-from chebai.preprocessing.collate import DefaultCollator, RaggedCollator
-
-EMBEDDING_OFFSET = 10
-PADDING_TOKEN_INDEX = 0
-MASK_TOKEN_INDEX = 1
-CLS_TOKEN = 2
-
-
-class DataReader:
-    """
-    Base class for reading and preprocessing data. Turns the raw input data (e.g., a SMILES string) into the model
-    input format (e.g., a list of tokens).
-
-    Args:
-        collator_kwargs: Optional dictionary of keyword arguments for the collator.
-        token_path: Optional path for the token file.
-        kwargs: Additional keyword arguments (not used).
-    """
-
-    COLLATOR = DefaultCollator
-
-    def __init__(
-        self,
-        collator_kwargs: Optional[Dict[str, Any]] = None,
-        token_path: Optional[str] = None,
-        **kwargs,
-    ):
-        if collator_kwargs is None:
-            collator_kwargs = dict()
-        self.collator = self.COLLATOR(**collator_kwargs)
-        self.dirname = os.path.dirname(__file__)
-        self._token_path = token_path
-
-    def _get_raw_data(self, row: Dict[str, Any]) -> Any:
-        """Get raw data from the row."""
-        return row["features"]
-
-    def _get_raw_label(self, row: Dict[str, Any]) -> Any:
-        """Get raw label from the row."""
-        return row["labels"]
-
-    def _get_raw_id(self, row: Dict[str, Any]) -> Any:
-        """Get raw ID from the row."""
-        return row.get("ident", row["features"])
-
-    def _get_raw_group(self, row: Dict[str, Any]) -> Any:
-        """Get raw group from the row."""
-        return row.get("group", None)
-
-    def _get_additional_kwargs(self, row: Dict[str, Any]) -> Dict[str, Any]:
-        """Get additional keyword arguments from the row."""
-        return row.get("additional_kwargs", dict())
-
-    def name(cls) -> str:
-        """Returns the name of the data reader."""
-        raise NotImplementedError
-
-    @property
-    def token_path(self) -> str:
-        """Get token path, create file if it does not exist yet."""
-        if self._token_path is not None:
-            return self._token_path
-        token_path = os.path.join(self.dirname, "bin", self.name(), "tokens.txt")
-        os.makedirs(os.path.join(self.dirname, "bin", self.name()), exist_ok=True)
-        if not os.path.exists(token_path):
-            with open(token_path, "x"):
-                pass
-        return token_path
-
-    def _read_id(self, raw_data: Any) -> Any:
-        """Read and return ID from raw data."""
-        return raw_data
-
-    def _read_data(self, raw_data: Any) -> Any:
-        """Read and return data from raw data."""
-        return raw_data
-
-    def _read_label(self, raw_label: Any) -> Any:
-        """Read and return label from raw label."""
-        return raw_label
-
-    def _read_group(self, raw: Any) -> Any:
-        """Read and return group from raw group data."""
-        return raw
-
-    def _read_components(self, row: Dict[str, Any]) -> Dict[str, Any]:
-        """Read and return components from the row."""
-        return dict(
-            features=self._get_raw_data(row),
-            labels=self._get_raw_label(row),
-            ident=self._get_raw_id(row),
-            group=self._get_raw_group(row),
-            additional_kwargs=self._get_additional_kwargs(row),
-        )
-
-    def to_data(self, row: Dict[str, Any]) -> Dict[str, Any]:
-        """Convert raw row data to processed data."""
-        d = self._read_components(row)
-        return dict(
-            features=self._read_data(d["features"]),
-            labels=self._read_label(d["labels"]),
-            ident=self._read_id(d["ident"]),
-            group=self._read_group(d["group"]),
-            **d["additional_kwargs"],
-        )
-
-    def on_finish(self) -> None:
-        """Hook to run at the end of preprocessing."""
-        return
+from chebai.preprocessing.collate import RaggedCollator
+from chebai.preprocessing.reader import DataReader
 
 
 class ProteinDataReader(DataReader):
@@ -139,31 +32,15 @@ class ProteinDataReader(DataReader):
 
     COLLATOR = RaggedCollator
 
+    # fmt: off
     # 21 natural amino acid notation
     AA_LETTER = [
-        "A",
-        "R",
-        "N",
-        "D",
-        "C",
-        "Q",
-        "E",
-        "G",
-        "H",
-        "I",
-        "L",
-        "K",
-        "M",
-        "F",
-        "P",
-        "S",
-        "T",
-        "W",
-        "Y",
-        "V",
+        "A", "R", "N", "D", "C", "Q", "E", "G", "H", "I",
+        "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V",
         # https://github.com/bio-ontology-research-group/deepgo2/blob/main/deepgo/aminoacids.py#L3-L5
         "X",  # Consider valid in latest paper year 2024 Reference number 3 in go_uniprot.py
     ]
+    # fmt: on
 
     def name(self) -> str:
         """
