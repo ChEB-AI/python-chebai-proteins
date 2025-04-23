@@ -167,3 +167,5 @@ cython_debug/
 /logs
 /results_buffer
 electra_pretrained.ckpt
+.jupyter
+.virtual_documents
