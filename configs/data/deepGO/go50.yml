@@ -1,1 +1,1 @@
-class_path: chebai.preprocessing.datasets.deepGO.go_uniprot.GOUniProtOver50
+class_path: chebai_proteins.preprocessing.datasets.deepGO.go_uniprot.GOUniProtOver50
