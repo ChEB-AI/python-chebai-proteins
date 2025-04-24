@@ -1,0 +1,5 @@
+class_path: torchmetrics.MetricCollection
+init_args:
+  metrics:
+    balanced-accuracy:
+      class_path: torchmetrics.classification.MultilabelAUROC
