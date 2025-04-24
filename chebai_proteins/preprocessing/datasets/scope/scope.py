@@ -24,7 +24,8 @@ import requests
 import torch
 from Bio import SeqIO
 from chebai.preprocessing.datasets.base import _DynamicDataset
-from chebai.preprocessing.reader import ESM2EmbeddingReader, ProteinDataReader
+
+from chebai_proteins.preprocessing.reader import ESM2EmbeddingReader, ProteinDataReader
 
 
 class _SCOPeDataExtractor(_DynamicDataset, ABC):
