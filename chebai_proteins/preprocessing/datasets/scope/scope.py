@@ -24,7 +24,7 @@ import requests
 import torch
 from Bio import SeqIO
 from chebai.preprocessing.datasets.base import _DynamicDataset
-from chebai.preprocessing.reader import ProteinDataReader
+from chebai.preprocessing.reader import ESM2EmbeddingReader, ProteinDataReader
 
 
 class _SCOPeDataExtractor(_DynamicDataset, ABC):
@@ -950,6 +950,10 @@ class SCOPeOverPartial2000(_SCOPeOverXPartial):
     """
 
     THRESHOLD: int = 2000
+
+
+class SCOPEOver50ESM(SCOPeOver50):
+    READER = ESM2EmbeddingReader
 
 
 if __name__ == "__main__":

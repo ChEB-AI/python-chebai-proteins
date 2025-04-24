@@ -1,0 +1,6 @@
+class_path: chebai.preprocessing.datasets.scope.scope.SCOPeOver50ESM
+init_args:
+  scope_version: "2.08"
+  reader_kwargs: {
+    truncation_length: 1000
+  }
