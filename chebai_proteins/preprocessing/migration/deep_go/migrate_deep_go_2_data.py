@@ -4,9 +4,10 @@ from collections import OrderedDict
 from typing import List, Literal, Optional
 
 import pandas as pd
-from chebai.preprocessing.datasets.deepGO.go_uniprot import DeepGO2MigratedData
-from chebai.preprocessing.reader import ProteinDataReader
 from jsonargparse import CLI
+
+from chebai_proteins.preprocessing.datasets.deepGO.go_uniprot import DeepGO2MigratedData
+from chebai_proteins.preprocessing.reader import ProteinDataReader
 
 
 class DeepGo2DataMigration:
