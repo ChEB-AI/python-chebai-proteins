@@ -166,6 +166,7 @@ class ESM2EmbeddingReader(DataReader):
 
     def __init__(
         self,
+        # --------- Default Parameters as per DeepGO2 ------------
         save_model_dir: str = os.path.join("data", "esm2_reader"),
         model_name: str = "esm2_t36_3B_UR50D",
         device: Optional[torch.device] = None,

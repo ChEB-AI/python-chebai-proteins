@@ -728,8 +728,6 @@ class _SCOPeDataExtractor(_DynamicDataset, ABC):
         """
         # TODO: find a more efficient way to do this
         filename_old = "classes.txt"
-        # filename_new = f"classes_v{self.scope_version_train}.txt"
-        # dataset = torch.load(os.path.join(self.processed_dir, "test.pt"))
 
         # Load original classes (from the current SCOPe version - scope_version)
         with open(os.path.join(self.processed_dir_main, filename_old), "r") as file:
@@ -760,7 +758,7 @@ class _SCOPeDataExtractor(_DynamicDataset, ABC):
                 # set the corresponding label in new_labels to True
                 if mapping[ind] is not None and label:
                     new_labels[mapping[ind]] = label
-            # Update the labels from test instance from scope_version to the new labels, which are compatible to both versions
+            # Update the labels from test instance of scope_version to new labels, which are compatible to both versions
             row["labels"] = new_labels
 
         return df_test_scope_version

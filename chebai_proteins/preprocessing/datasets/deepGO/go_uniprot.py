@@ -394,6 +394,10 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
         )
         # Initialize the GO term labels/columns to False
         selected_classes = self.select_classes(g, data_df=data_df)
+        if not selected_classes:
+            raise ValueError(
+                f"No classes selected for given threshold {self.THRESHOLD}"
+            )
         new_label_columns = pd.DataFrame(
             False, index=data_df.index, columns=selected_classes
         )
