@@ -951,7 +951,7 @@ class SCOPeOverPartial2000(_SCOPeOverXPartial):
     THRESHOLD: int = 2000
 
 
-class SCOPEOver50ESM(SCOPeOver50):
+class SCOPeOver50ESM(SCOPeOver50):
     READER = ESM2EmbeddingReader
 
 
