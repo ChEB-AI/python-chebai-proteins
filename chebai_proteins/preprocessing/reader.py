@@ -8,11 +8,8 @@ from chebai.preprocessing.collate import RaggedCollator
 from chebai.preprocessing.reader import EMBEDDING_OFFSET, DataReader
 from esm import Alphabet
 from esm.model.esm2 import ESM2
-from esm.pretrained import (
-    _has_regression_weights,
-    load_model_and_alphabet_core,
-    load_model_and_alphabet_local,
-)
+from esm.pretrained import _has_regression_weights  # noqa
+from esm.pretrained import load_model_and_alphabet_core, load_model_and_alphabet_local
 
 
 class ProteinDataReader(DataReader):
@@ -24,7 +21,7 @@ class ProteinDataReader(DataReader):
         Refer for amino acid sequence:  https://en.wikipedia.org/wiki/Protein_primary_structure
 
     Args:
-        collator_kwargs (Optional[Dict[str, Any]]): Optional dictionary of keyword arguments for configuring the collator.
+        collator_kwargs (Optional[Dict[str, Any]]): Optional dict of keyword arguments for configuring the collator.
         token_path (Optional[str]): Path to the token file. If not provided, it will be created automatically.
         kwargs: Additional keyword arguments.
     """
@@ -132,7 +129,7 @@ class ProteinDataReader(DataReader):
 
     def on_finish(self) -> None:
         """
-        Saves the current cache of tokens to the token file. This method is called after all data processing is complete.
+        Saves the current cache of tokens to the token file.This method is called after all data processing is complete.
         """
         with open(self.token_path, "w") as pk:
             print(f"Saving {len(self.cache)} tokens to {self.token_path}...")
@@ -157,6 +154,8 @@ class ESM2EmbeddingReader(DataReader):
         These smaller models are good for testing and debugging purposes.
 
     """
+
+    COLLATOR = RaggedCollator
 
     # https://github.com/facebookresearch/esm/blob/main/esm/pretrained.py#L53
     _MODELS_URL = "https://dl.fbaipublicfiles.com/fair-esm/models/{}.pt"
@@ -270,12 +269,12 @@ class ESM2EmbeddingReader(DataReader):
             )
         except HTTPError as e:
             raise Exception(
-                f"Could not load {url}. Did you specify the correct model name?"
+                f"Could not load {url}. Did you specify the correct model name? \n Error: {e}"
             )
         return data
 
-    @staticmethod
-    def name() -> str:
+    @classmethod
+    def name(cls) -> str:
         """
         Returns the name of the data reader. This method identifies the specific type of data reader.
 
