@@ -221,9 +221,28 @@ class ESM2EmbeddingReader(DataReader):
         """
         model_location = os.path.join(self.save_model_dir, f"{self.model_name}.pt")
         if os.path.exists(model_location):
-            return load_model_and_alphabet_local(model_location)
+            return self.load_model_and_alphabet_local(model_location)
         else:
             return self.load_model_and_alphabet_hub()
+
+    @staticmethod
+    def load_model_and_alphabet_local(model_location):
+        """Load from local path. The regression weights need to be co-located"""
+        model_location = Path(model_location)
+        model_data = torch.load(
+            str(model_location), map_location="cpu", weights_only=False
+        )
+        model_name = model_location.stem
+        if _has_regression_weights(model_name):
+            regression_location = (
+                str(model_location.with_suffix("")) + "-contact-regression.pt"
+            )
+            regression_data = torch.load(
+                regression_location, map_location="cpu", weights_only=False
+            )
+        else:
+            regression_data = None
+        return load_model_and_alphabet_core(model_name, model_data, regression_data)
 
     def load_model_and_alphabet_hub(self) -> Tuple[ESM2, Alphabet]:
         """
@@ -257,7 +276,11 @@ class ESM2EmbeddingReader(DataReader):
         """
         try:
             data = torch.hub.load_state_dict_from_url(
-                url, self.save_model_dir, progress=True, map_location=self.device
+                url,
+                self.save_model_dir,
+                progress=True,
+                map_location=self.device,
+                weights_only=False,
             )
 
         except RuntimeError:
@@ -266,6 +289,7 @@ class ESM2EmbeddingReader(DataReader):
             data = torch.load(
                 f"{torch.hub.get_dir()}/checkpoints/{fn}",
                 map_location="cpu",
+                weights_only=False,
             )
         except HTTPError as e:
             raise Exception(
