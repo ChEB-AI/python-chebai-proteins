@@ -2,7 +2,9 @@ import unittest
 from typing import List
 from unittest.mock import mock_open, patch
 
-from chebai_proteins.preprocessing.reader import EMBEDDING_OFFSET, ProteinDataReader
+from chebai.preprocessing.reader import EMBEDDING_OFFSET
+
+from chebai_proteins.preprocessing.reader import ProteinDataReader
 
 
 class TestProteinDataReader(unittest.TestCase):
@@ -25,14 +27,16 @@ class TestProteinDataReader(unittest.TestCase):
         """
         cls.reader = ProteinDataReader(token_path="/mock/path")
         # After initializing, cls.reader.cache should now be set to ['M', 'K', 'T', 'F', 'R', 'N']
-        assert cls.reader.cache == [
-            "M",
-            "K",
-            "T",
-            "F",
-            "R",
-            "N",
-        ], "Cache initialization did not match expected tokens."
+        assert list(cls.reader.cache.items()) == list(
+            {
+                "M": 0,
+                "K": 1,
+                "T": 2,
+                "F": 3,
+                "R": 4,
+                "N": 5,
+            }.items()
+        ), "Initial cache does not match expected values or the order doesn't match."
 
     def test_read_data(self) -> None:
         """
@@ -86,7 +90,7 @@ class TestProteinDataReader(unittest.TestCase):
         )
         # Ensure it's at the correct index
         self.assertEqual(
-            self.reader.cache.index("Y"),
+            self.reader.cache["Y"],
             len(self.reader.cache) - 1,
             "The new token 'Y' was not added at the correct index in the cache.",
         )
@@ -133,6 +137,57 @@ class TestProteinDataReader(unittest.TestCase):
             expected_output,
             "The _read_data method did not correctly handle repeated tokens.",
         )
+
+    @patch("builtins.open", new_callable=mock_open)
+    def test_finish_method_for_new_tokens(self, mock_file: mock_open) -> None:
+        """
+        Test the on_finish method to ensure it appends only the new tokens to the token file in order.
+        """
+        # Simulate that some tokens were already loaded
+        self.reader._loaded_tokens_count = 6  # 6 tokens already loaded
+        self.reader.cache = {
+            "M": 0,
+            "K": 1,
+            "T": 2,
+            "F": 3,
+            "R": 4,
+            "N": 5,
+            "W": 6,  # New token 1
+            "Y": 7,  # New token 2
+            "V": 8,  # New token 3
+            "Q": 9,  # New token 4
+            "E": 10,  # New token 5
+        }
+
+        # Run the on_finish method
+        self.reader.on_finish()
+
+        # Check that the file was opened in append mode ('a')
+        mock_file.assert_called_with(self.reader.token_path, "a")
+
+        # Verify the new tokens were written in the correct order
+        mock_file().writelines.assert_called_with(
+            ["[H-]\n", "Br\n", "Cl\n", "Na\n", "Mg\n"]
+        )
+
+    def test_finish_method_no_new_tokens(self) -> None:
+        """
+        Test the on_finish method when no new tokens are added (cache is the same).
+        """
+        self.reader._loaded_tokens_count = 6  # No new tokens
+        self.reader.cache = {
+            "M": 0,
+            "K": 1,
+            "T": 2,
+            "F": 3,
+            "R": 4,
+            "N": 5,
+        }
+
+        with patch("builtins.open", new_callable=mock_open) as mock_file:
+            self.reader.on_finish()
+            # Check that no new tokens were written
+            mock_file().writelines.assert_not_called()
 
 
 if __name__ == "__main__":
