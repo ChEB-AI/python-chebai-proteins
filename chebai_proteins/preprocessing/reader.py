@@ -5,14 +5,14 @@ from urllib.error import HTTPError
 
 import torch
 from chebai.preprocessing.collate import RaggedCollator
-from chebai.preprocessing.reader import EMBEDDING_OFFSET, DataReader
+from chebai.preprocessing.reader import DataReader, TokenIndexerReader
 from esm import Alphabet
 from esm.model.esm2 import ESM2
 from esm.pretrained import _has_regression_weights  # noqa
-from esm.pretrained import load_model_and_alphabet_core, load_model_and_alphabet_local
+from esm.pretrained import load_model_and_alphabet_core
 
 
-class ProteinDataReader(DataReader):
+class ProteinDataReader(TokenIndexerReader):
     """
     Data reader for protein sequences using amino acid tokens. This class processes raw protein sequences into a format
     suitable for model input by tokenizing them and assigning unique indices to each token.
@@ -30,12 +30,12 @@ class ProteinDataReader(DataReader):
 
     # fmt: off
     # 21 natural amino acid notation
-    AA_LETTER = [
+    AA_LETTER = {
         "A", "R", "N", "D", "C", "Q", "E", "G", "H", "I",
         "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V",
         # https://github.com/bio-ontology-research-group/deepgo2/blob/main/deepgo/aminoacids.py#L3-L5
         "X",  # Consider valid in latest paper year 2024 Reference number 3 in go_uniprot.py
-    ]
+    }
     # fmt: on
 
     def name(self) -> str:
@@ -68,10 +68,6 @@ class ProteinDataReader(DataReader):
 
         super().__init__(*args, **kwargs)
 
-        # Load the existing tokens from the token file into a cache
-        with open(self.token_path, "r") as pk:
-            self.cache = [x.strip() for x in pk]
-
     def _get_token_index(self, token: str) -> int:
         """
         Returns a unique index for each token (amino acid). If the token is not already in the cache, it is added.
@@ -102,9 +98,7 @@ class ProteinDataReader(DataReader):
                         + error_str
                     )
 
-        if str(token) not in self.cache:
-            self.cache.append(str(token))
-        return self.cache.index(str(token)) + EMBEDDING_OFFSET
+        return super()._get_token_index(token)
 
     def _read_data(self, raw_data: str) -> List[int]:
         """
@@ -126,15 +120,6 @@ class ProteinDataReader(DataReader):
 
         # If n_gram is None, tokenize the sequence at the amino acid level (single-letter representation)
         return [self._get_token_index(aa) for aa in raw_data]
-
-    def on_finish(self) -> None:
-        """
-        Saves the current cache of tokens to the token file.This method is called after all data processing is complete.
-        """
-        with open(self.token_path, "w") as pk:
-            print(f"Saving {len(self.cache)} tokens to {self.token_path}...")
-            print(f"First 10 tokens: {self.cache[:10]}")
-            pk.writelines([f"{c}\n" for c in self.cache])
 
 
 class ESM2EmbeddingReader(DataReader):
