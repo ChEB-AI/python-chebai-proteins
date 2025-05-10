@@ -14,7 +14,7 @@ class TestProteinDataReader(unittest.TestCase):
 
     @classmethod
     @patch(
-        "chebai_proteins.preprocessing.reader.open",
+        "chebai.preprocessing.reader.open",
         new_callable=mock_open,
         read_data="M\nK\nT\nF\nR\nN",
     )
@@ -166,9 +166,7 @@ class TestProteinDataReader(unittest.TestCase):
         mock_file.assert_called_with(self.reader.token_path, "a")
 
         # Verify the new tokens were written in the correct order
-        mock_file().writelines.assert_called_with(
-            ["[H-]\n", "Br\n", "Cl\n", "Na\n", "Mg\n"]
-        )
+        mock_file().writelines.assert_called_with(["W\n", "Y\n", "V\n", "Q\n", "E\n"])
 
     def test_finish_method_no_new_tokens(self) -> None:
         """
