@@ -1,4 +1,5 @@
 import os
+from abc import ABC
 from pathlib import Path
 from typing import List, Optional, Tuple
 from urllib.error import HTTPError
@@ -12,7 +13,15 @@ from esm.pretrained import _has_regression_weights  # noqa
 from esm.pretrained import load_model_and_alphabet_core
 
 
-class ProteinDataReader(TokenIndexerReader):
+class _ChebaiProteinsDataReader(DataReader, ABC):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # This to override the token directory path which points to `chebai` repo instead of `chebai-proteins` to
+        # search for tokens.txt files for readers defined in `chebai-proteins` repository.
+        self.dirname = os.path.dirname(__file__)
+
+
+class ProteinDataReader(TokenIndexerReader, _ChebaiProteinsDataReader):
     """
     Data reader for protein sequences using amino acid tokens. This class processes raw protein sequences into a format
     suitable for model input by tokenizing them and assigning unique indices to each token.
@@ -122,7 +131,7 @@ class ProteinDataReader(TokenIndexerReader):
         return [self._get_token_index(aa) for aa in raw_data]
 
 
-class ESM2EmbeddingReader(DataReader):
+class ESM2EmbeddingReader(_ChebaiProteinsDataReader):
     """
     A data reader to process protein sequences using the ESM2 model for embeddings.
 
