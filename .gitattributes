@@ -1,0 +1,10 @@
+# Juypter notebooks contains images, and tables, and parsing text
+# blowing up the total language fraction unrealistically;
+# then 'Juypter notebooks' are suddenly major part of repo language.
+
+# As they don't want to parse notebooks better
+# (wont-fix = https://github.com/github/linguist/issues/3496)
+# Simply exclude this file from counting now:
+
+notebooks/*.ipynb linguist-generated=true
+stream_viz/tutorial/*.ipynb linguist-generated=true
