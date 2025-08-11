@@ -457,6 +457,14 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
 
             if not record.sequence or len(record.sequence) > self.max_sequence_length:
                 # Consider protein with only sequence representation and seq. length not greater than max seq. length
+
+                # DeepGO1 paper ignores proteins with sequence length greater than 1002: https://github.com/bio-ontology-research-group/deepgo/blob/master/aaindex.py#L9-L14
+                # But DeepGO2 paper truncates the sequence to 1000: https://github.com/bio-ontology-research-group/deepgo2/blob/main/deepgo/aminoacids.py#L26-L33
+                # Latest Discussion: https://github.com/ChEB-AI/python-chebai/issues/36#issuecomment-2385693976
+                # So, we ignore proteins with sequence length greater than max_sequence_length
+                # The rationale is that with only a partial representation of the protein sequence, the model may not learn effectively.
+                # Also, proteins longer than 1002 are only 3.32% of the total proteins in Swiss-Prot dataset.
+                # https://github.com/ChEB-AI/python-chebai/issues/36#issuecomment-2431460448
                 continue
 
             if any(aa in AMBIGUOUS_AMINO_ACIDS for aa in record.sequence):
