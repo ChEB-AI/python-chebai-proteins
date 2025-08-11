@@ -72,12 +72,12 @@ class _SCOPeDataExtractor(_DynamicDataset, ABC):
         self,
         scope_version: str,
         scope_version_train: Optional[str] = None,
-        max_sequence_len: int = 1000,
+        max_sequence_len: int = 1002,
         **kwargs,
     ):
         self.scope_version: str = scope_version
         self.scope_version_train: str = scope_version_train
-        self.max_sequence_len: int = max_sequence_len
+        self.max_sequence_len: int = int(max_sequence_len)
 
         super(_SCOPeDataExtractor, self).__init__(**kwargs)
 
@@ -224,7 +224,6 @@ class _SCOPeDataExtractor(_DynamicDataset, ABC):
         # Step 1: Build the graph structure and store node attributes
         for row in df_scope.itertuples(index=False):
             if row.level == "px":
-
                 pdb_id, chain_id = row.sid[1:5], row.sid[5]
 
                 if pdb_id not in pdb_id_set or chain_id == "_":
@@ -546,7 +545,6 @@ class _SCOPeDataExtractor(_DynamicDataset, ABC):
         for record in SeqIO.parse(
             os.path.join(self.scope_root_dir, self.raw_file_names_dict["PDB"]), "fasta"
         ):
-
             if not record.seq or len(record.seq) > self.max_sequence_len:
                 continue
 
@@ -934,7 +932,6 @@ class SCOPeOver2000(_SCOPeOverX):
 
 
 class SCOPeOver50(_SCOPeOverX):
-
     THRESHOLD = 50
 
 

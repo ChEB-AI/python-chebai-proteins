@@ -102,6 +102,7 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
 
     # Gene Ontology (GO) has three major branches, one for biological processes (BP), molecular functions (MF) and
     # cellular components (CC). The value "all" will take data related to all three branches into account.
+    # TODO: should we be really allowing all branches for single dataset?
     _ALL_GO_BRANCHES: str = "all"
     _GO_BRANCH_NAMESPACE: Dict[str, str] = {
         "BP": "biological_process",
@@ -109,10 +110,10 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
         "CC": "cellular_component",
     }
 
-    def __init__(self, **kwargs):
-        self.go_branch: str = self._get_go_branch(**kwargs)
+    def __init__(self, go_branch: str, max_sequence_len: int = 1002, **kwargs):
+        self.go_branch: str = self._get_go_branch(go_branch)
 
-        self.max_sequence_length: int = int(kwargs.get("max_sequence_length", 1002))
+        self.max_sequence_length: int = int(max_sequence_len)
         assert (
             self.max_sequence_length >= 1
         ), "Max sequence length should be greater than or equal to 1."
@@ -126,7 +127,7 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
             )
 
     @classmethod
-    def _get_go_branch(cls, **kwargs) -> str:
+    def _get_go_branch(cls, go_branch_value: str, **kwargs) -> str:
         """
         Retrieves the Gene Ontology (GO) branch based on provided keyword arguments.
         This method checks if a valid GO branch value is provided in the keyword arguments.
@@ -141,7 +142,6 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
             ValueError: If the provided 'go_branch' value is not in the allowed list of values.
         """
 
-        go_branch_value = kwargs.get("go_branch", cls._ALL_GO_BRANCHES)
         allowed_values = list(cls._GO_BRANCH_NAMESPACE.keys()) + [cls._ALL_GO_BRANCHES]
         if go_branch_value not in allowed_values:
             raise ValueError(
