@@ -130,7 +130,7 @@ class _SCOPeDataExtractor(_DynamicDataset, ABC):
         os.makedirs(os.path.dirname(pdb_seq_file_path), exist_ok=True)
 
         if not os.path.isfile(pdb_seq_file_path):
-            print(f"Missing PDB raw data, Downloading PDB sequence data....")
+            print("Missing PDB raw data, Downloading PDB sequence data....")
 
             # Create a temporary file
             with NamedTemporaryFile(delete=False) as tf:
@@ -146,7 +146,7 @@ class _SCOPeDataExtractor(_DynamicDataset, ABC):
 
             # Unpack the gzipped file
             try:
-                print(f"Unzipping the file....")
+                print("Unzipping the file....")
                 with gzip.open(temp_filename, "rb") as f_in:
                     output_file_path = pdb_seq_file_path
                     with open(output_file_path, "wb") as f_out:
@@ -422,7 +422,7 @@ class _SCOPeDataExtractor(_DynamicDataset, ABC):
         Raises:
             RuntimeError: If no sunids are selected.
         """
-        print(f"Process graph")
+        print("Process graph")
 
         selected_sun_ids_per_lvl = self.select_classes(graph)
 
@@ -665,8 +665,8 @@ class _SCOPeDataExtractor(_DynamicDataset, ABC):
             )
         except FileNotFoundError:
             raise FileNotFoundError(
-                f"File data.pt doesn't exists. "
-                f"Please call 'prepare_data' and/or 'setup' methods to generate the dataset files"
+                "File data.pt doesn't exists. "
+                "Please call 'prepare_data' and/or 'setup' methods to generate the dataset files"
             )
 
         df_scope_version = pd.DataFrame(data_scope_version)

@@ -181,7 +181,7 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
 
         if not os.path.isfile(go_path):
             print("Missing Gene Ontology raw data")
-            print(f"Downloading Gene Ontology data....")
+            print("Downloading Gene Ontology data....")
             r = requests.get(self._GO_DATA_URL, allow_redirects=True)
             r.raise_for_status()  # Check if the request was successful
             open(go_path, "wb").write(r.content)
@@ -207,7 +207,7 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
         os.makedirs(os.path.dirname(uni_prot_file_path), exist_ok=True)
 
         if not os.path.isfile(uni_prot_file_path):
-            print(f"Downloading Swiss UniProt data....")
+            print("Downloading Swiss UniProt data....")
 
             # Create a temporary file
             with NamedTemporaryFile(delete=False) as tf:
@@ -223,7 +223,7 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
 
             # Unpack the gzipped file
             try:
-                print(f"Unzipping the file....")
+                print("Unzipping the file....")
                 with gzip.open(temp_filename, "rb") as f_in:
                     output_file_path = uni_prot_file_path
                     with open(output_file_path, "wb") as f_out:
@@ -375,7 +375,7 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
         Returns:
             pd.DataFrame: The raw dataset created from the graph.
         """
-        print(f"Processing graph")
+        print("Processing graph")
 
         data_df = self._get_swiss_to_go_mapping()
         # add ancestors to go ids
@@ -559,8 +559,8 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
             )
         except FileNotFoundError:
             raise FileNotFoundError(
-                f"File data.pt doesn't exists. "
-                f"Please call 'prepare_data' and/or 'setup' methods to generate the dataset files"
+                "File data.pt doesn't exists. "
+                "Please call 'prepare_data' and/or 'setup' methods to generate the dataset files"
             )
 
         df_go_data = pd.DataFrame(data_go)
@@ -586,7 +586,7 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
         Returns:
             str: The path to the base directory, which is "data/GO_UniProt".
         """
-        return os.path.join("data", f"GO_UniProt")
+        return os.path.join("data", "GO_UniProt")
 
     @property
     def raw_file_names_dict(self) -> dict:

@@ -223,8 +223,8 @@ class _ProteinPretrainingData(_DynamicDataset, ABC):
             )
         except FileNotFoundError:
             raise FileNotFoundError(
-                f"File data.pt doesn't exists. "
-                f"Please call 'prepare_data' and/or 'setup' methods to generate the dataset files"
+                "File data.pt doesn't exists. "
+                "Please call 'prepare_data' and/or 'setup' methods to generate the dataset files"
             )
 
         df_go_data = pd.DataFrame(data_go)

@@ -64,7 +64,7 @@ Before running any training scripts, ensure the environment is correctly configu
       export PYTHONPATH=path/to/python-chebai
       ```
       or vice versa.
-      
+
     * If you're working within both repositories simultaneously or facing module not found errors,  we **recommend configuring both directories**:
 
       ```bash
