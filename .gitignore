@@ -170,3 +170,4 @@ electra_pretrained.ckpt
 .jupyter
 .virtual_documents
 .isort.cfg
+.vscode

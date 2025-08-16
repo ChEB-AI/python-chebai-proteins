@@ -105,9 +105,9 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
     # TODO: should we be really allowing all branches for single dataset?
     _ALL_GO_BRANCHES: str = "all"
     _GO_BRANCH_NAMESPACE: Dict[str, str] = {
-        "BP": "biological_process",
-        "MF": "molecular_function",
-        "CC": "cellular_component",
+        "BP": "biological_process",  # Huge branch, with 20,000+ GO terms
+        "MF": "molecular_function",  # smaller branch, with 6000+ GO terms
+        "CC": "cellular_component",  # smallest branch, with 2,000+ GO terms
     }
 
     def __init__(self, go_branch: str, max_sequence_len: int = 1002, **kwargs):

@@ -3,8 +3,11 @@ init_args:
   optimizer_kwargs:
     lr: 1e-3
   config:
-    vocab_size: 31
-    max_position_embeddings: 1002
+    vocab_size: 31 # 21 unique + embedding offset (10)
+    # For classification:[Maximum sequence length (1002) (padding will be also upto 1002)] + 1 for CLS token
+    # For pretraining: [Maximum sequence length (1002) (padding will be also upto 1002)] + 10 embedding offset (includes all special tokens)
+    # Hence, use max of (classification, pretraining): max_position_embeddings = 1002 + 10  = 1012
+    max_position_embeddings: 1012
     num_attention_heads: 8
     num_hidden_layers: 6
     type_vocab_size: 1
