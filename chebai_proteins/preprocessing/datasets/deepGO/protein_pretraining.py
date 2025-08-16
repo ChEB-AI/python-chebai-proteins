@@ -38,7 +38,7 @@ class _ProteinPretrainingData(_DynamicDataset, ABC):
         Args:
             **kwargs: Additional arguments for the superclass initialization.
         """
-        self._go_uniprot_extractor = GOUniProtOver250()
+        self._go_uniprot_extractor = GOUniProtOver250(go_branch="all")
         assert self._go_uniprot_extractor.go_branch == GOUniProtOver250._ALL_GO_BRANCHES
 
         self.max_sequence_length: int = int(kwargs.get("max_sequence_length", 1002))
@@ -143,7 +143,6 @@ class _ProteinPretrainingData(_DynamicDataset, ABC):
             has_valid_associated_go_label = False
             for cross_ref in record.cross_references:
                 if cross_ref[0] == self._go_uniprot_extractor._GO_DATA_INIT:
-
                     if len(cross_ref) <= 3:
                         # No evidence code
                         continue
