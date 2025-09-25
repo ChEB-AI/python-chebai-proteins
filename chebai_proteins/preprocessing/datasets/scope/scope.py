@@ -74,10 +74,10 @@ class _SCOPeDataExtractor(_DynamicDataset, ABC):
         scope_version: str,
         scope_version_train: Optional[str] = None,
         max_sequence_len: int = 1002,
-        use_esm2_embedding: bool = False,
+        use_esm2_embeddings: bool = False,
         **kwargs,
     ):
-        if use_esm2_embedding:
+        if bool(use_esm2_embeddings):
             self.READER = ESM2EmbeddingReader
 
         self.scope_version: str = scope_version
