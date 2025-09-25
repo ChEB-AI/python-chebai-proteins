@@ -110,7 +110,18 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
         "CC": "cellular_component",  # smallest branch, with 2,000+ GO terms
     }
 
-    def __init__(self, go_branch: str, max_sequence_len: int = 1002, **kwargs):
+    READER = None
+
+    def __init__(
+        self,
+        go_branch: str,
+        max_sequence_len: int = 1002,
+        use_esm2_embeddings: bool = False,
+        **kwargs,
+    ):
+        if use_esm2_embeddings:
+            self.READER = dr.ESM2ProteinDataReader
+
         self.go_branch: str = self._get_go_branch(go_branch)
 
         self.max_sequence_length: int = int(max_sequence_len)
