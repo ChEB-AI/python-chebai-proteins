@@ -131,7 +131,7 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
 
         super(_GOUniProtDataExtractor, self).__init__(**kwargs)
 
-        if self.reader.n_gram is not None:
+        if hasattr(self.reader, "n_gram") and self.reader.n_gram is not None:
             assert self.max_sequence_length >= self.reader.n_gram, (
                 f"max_sequence_length ({self.max_sequence_length}) must be greater than "
                 f"or equal to n_gram ({self.reader.n_gram})."

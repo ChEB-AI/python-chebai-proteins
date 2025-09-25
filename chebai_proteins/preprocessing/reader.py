@@ -181,7 +181,7 @@ class ESM2EmbeddingReader(DataReader):
         self.truncation_length = truncation_length
         self.toks_per_batch = toks_per_batch
         self.return_contacts = return_contacts
-        self.repr_layer = repr_layer
+        self.repr_layer = int(repr_layer)
 
         self._model: Optional[ESM2] = None
         self._alphabet: Optional[Alphabet] = None
@@ -355,6 +355,7 @@ class ESM2EmbeddingReader(DataReader):
 
         References:
             https://github.com/bio-ontology-research-group/deepgo2/blob/main/deepgo/extract_esm.py#L82-L107
+            https://github.com/facebookresearch/esm?tab=readme-ov-file#usage-
 
         Returns:
             torch.Tensor: Protein embedding from the specified representation layer.
@@ -393,3 +394,16 @@ class ESM2EmbeddingReader(DataReader):
             None
         """
         pass
+
+
+if __name__ == "__main__":
+    reader = ProteinDataReader()
+    sample_sequence = "MKTFFVAGVILLLLPLVSSQCVNLTTRTQSRGDPTQKARPEPT"
+    token_indices = reader._read_data(sample_sequence)
+    print(f"Token indices for the sequence: {token_indices}")
+
+    esm_reader = ESM2EmbeddingReader(
+        model_name="esm2_t6_8M_UR50D", repr_layer="6", device=torch.device("cpu")
+    )
+    embeddings = esm_reader._read_data(sample_sequence)
+    print(f"ESM2 embeddings shape: {len(embeddings)}")
