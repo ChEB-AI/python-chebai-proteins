@@ -67,14 +67,19 @@ class _SCOPeDataExtractor(_DynamicDataset, ABC):
         "sp": "species",
         "px": "domain",
     }
+    READER = None
 
     def __init__(
         self,
         scope_version: str,
         scope_version_train: Optional[str] = None,
         max_sequence_len: int = 1002,
+        use_esm2_embedding: bool = False,
         **kwargs,
     ):
+        if use_esm2_embedding:
+            self.READER = ESM2EmbeddingReader
+
         self.scope_version: str = scope_version
         self.scope_version_train: str = scope_version_train
         self.max_sequence_len: int = int(max_sequence_len)
@@ -946,10 +951,6 @@ class SCOPeOverPartial2000(_SCOPeOverXPartial):
     """
 
     THRESHOLD: int = 2000
-
-
-class SCOPeOver50ESM(SCOPeOver50):
-    READER = ESM2EmbeddingReader
 
 
 if __name__ == "__main__":

@@ -120,7 +120,7 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
         **kwargs,
     ):
         if use_esm2_embeddings:
-            self.READER = dr.ESM2ProteinDataReader
+            self.READER = dr.ESM2EmbeddingReader
 
         self.go_branch: str = self._get_go_branch(go_branch)
 
