@@ -42,9 +42,9 @@ class _ProteinPretrainingData(_DynamicDataset, ABC):
         assert self._go_uniprot_extractor.go_branch == GOUniProtOver250._ALL_GO_BRANCHES
 
         self.max_sequence_length: int = int(kwargs.get("max_sequence_length", 1002))
-        assert (
-            self.max_sequence_length >= 1
-        ), "Max sequence length should be greater than or equal to 1."
+        assert self.max_sequence_length >= 1, (
+            "Max sequence length should be greater than or equal to 1."
+        )
 
         super(_ProteinPretrainingData, self).__init__(**kwargs)
 

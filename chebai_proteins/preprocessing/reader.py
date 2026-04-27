@@ -59,9 +59,9 @@ class ProteinDataReader(TokenIndexerReader):
             **kwargs: Additional keyword arguments passed to the base class.
         """
         if n_gram is not None:
-            assert (
-                int(n_gram) >= 2
-            ), "Ngrams must be greater than or equal to 2 if provided."
+            assert int(n_gram) >= 2, (
+                "Ngrams must be greater than or equal to 2 if provided."
+            )
             self.n_gram = int(n_gram)
         else:
             self.n_gram = None

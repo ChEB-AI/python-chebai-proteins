@@ -96,9 +96,7 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
     _LABELS_START_IDX: int = 4
 
     _GO_DATA_URL: str = "https://purl.obolibrary.org/obo/go/go-basic.obo"
-    _SWISS_DATA_URL: str = (
-        "https://ftp.uniprot.org/pub/databases/uniprot/knowledgebase/complete/uniprot_sprot.dat.gz"
-    )
+    _SWISS_DATA_URL: str = "https://ftp.uniprot.org/pub/databases/uniprot/knowledgebase/complete/uniprot_sprot.dat.gz"
 
     # Gene Ontology (GO) has three major branches, one for biological processes (BP), molecular functions (MF) and
     # cellular components (CC). The value "all" will take data related to all three branches into account.
@@ -125,9 +123,9 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
         self.go_branch: str = self._get_go_branch(go_branch)
 
         self.max_sequence_length: int = int(max_sequence_len)
-        assert (
-            self.max_sequence_length >= 1
-        ), "Max sequence length should be greater than or equal to 1."
+        assert self.max_sequence_length >= 1, (
+            "Max sequence length should be greater than or equal to 1."
+        )
 
         super(_GOUniProtDataExtractor, self).__init__(**kwargs)
 
