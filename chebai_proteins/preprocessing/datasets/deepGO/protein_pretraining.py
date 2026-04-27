@@ -38,13 +38,13 @@ class _ProteinPretrainingData(_DynamicDataset, ABC):
         Args:
             **kwargs: Additional arguments for the superclass initialization.
         """
-        self._go_uniprot_extractor = GOUniProtOver250()
+        self._go_uniprot_extractor = GOUniProtOver250(go_branch="all")
         assert self._go_uniprot_extractor.go_branch == GOUniProtOver250._ALL_GO_BRANCHES
 
         self.max_sequence_length: int = int(kwargs.get("max_sequence_length", 1002))
-        assert (
-            self.max_sequence_length >= 1
-        ), "Max sequence length should be greater than or equal to 1."
+        assert self.max_sequence_length >= 1, (
+            "Max sequence length should be greater than or equal to 1."
+        )
 
         super(_ProteinPretrainingData, self).__init__(**kwargs)
 
@@ -143,7 +143,6 @@ class _ProteinPretrainingData(_DynamicDataset, ABC):
             has_valid_associated_go_label = False
             for cross_ref in record.cross_references:
                 if cross_ref[0] == self._go_uniprot_extractor._GO_DATA_INIT:
-
                     if len(cross_ref) <= 3:
                         # No evidence code
                         continue
@@ -223,8 +222,8 @@ class _ProteinPretrainingData(_DynamicDataset, ABC):
             )
         except FileNotFoundError:
             raise FileNotFoundError(
-                f"File data.pt doesn't exists. "
-                f"Please call 'prepare_data' and/or 'setup' methods to generate the dataset files"
+                "File data.pt doesn't exists. "
+                "Please call 'prepare_data' and/or 'setup' methods to generate the dataset files"
             )
 
         df_go_data = pd.DataFrame(data_go)

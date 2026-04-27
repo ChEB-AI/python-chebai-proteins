@@ -67,17 +67,22 @@ class _SCOPeDataExtractor(_DynamicDataset, ABC):
         "sp": "species",
         "px": "domain",
     }
+    READER = None
 
     def __init__(
         self,
         scope_version: str,
         scope_version_train: Optional[str] = None,
-        max_sequence_len: int = 1000,
+        max_sequence_len: int = 1002,
+        use_esm2_embeddings: bool = False,
         **kwargs,
     ):
+        if bool(use_esm2_embeddings):
+            self.READER = ESM2EmbeddingReader
+
         self.scope_version: str = scope_version
         self.scope_version_train: str = scope_version_train
-        self.max_sequence_len: int = max_sequence_len
+        self.max_sequence_len: int = int(max_sequence_len)
 
         super(_SCOPeDataExtractor, self).__init__(**kwargs)
 
@@ -130,7 +135,7 @@ class _SCOPeDataExtractor(_DynamicDataset, ABC):
         os.makedirs(os.path.dirname(pdb_seq_file_path), exist_ok=True)
 
         if not os.path.isfile(pdb_seq_file_path):
-            print(f"Missing PDB raw data, Downloading PDB sequence data....")
+            print("Missing PDB raw data, Downloading PDB sequence data....")
 
             # Create a temporary file
             with NamedTemporaryFile(delete=False) as tf:
@@ -146,7 +151,7 @@ class _SCOPeDataExtractor(_DynamicDataset, ABC):
 
             # Unpack the gzipped file
             try:
-                print(f"Unzipping the file....")
+                print("Unzipping the file....")
                 with gzip.open(temp_filename, "rb") as f_in:
                     output_file_path = pdb_seq_file_path
                     with open(output_file_path, "wb") as f_out:
@@ -224,7 +229,6 @@ class _SCOPeDataExtractor(_DynamicDataset, ABC):
         # Step 1: Build the graph structure and store node attributes
         for row in df_scope.itertuples(index=False):
             if row.level == "px":
-
                 pdb_id, chain_id = row.sid[1:5], row.sid[5]
 
                 if pdb_id not in pdb_id_set or chain_id == "_":
@@ -422,7 +426,7 @@ class _SCOPeDataExtractor(_DynamicDataset, ABC):
         Raises:
             RuntimeError: If no sunids are selected.
         """
-        print(f"Process graph")
+        print("Process graph")
 
         selected_sun_ids_per_lvl = self.select_classes(graph)
 
@@ -546,7 +550,6 @@ class _SCOPeDataExtractor(_DynamicDataset, ABC):
         for record in SeqIO.parse(
             os.path.join(self.scope_root_dir, self.raw_file_names_dict["PDB"]), "fasta"
         ):
-
             if not record.seq or len(record.seq) > self.max_sequence_len:
                 continue
 
@@ -665,8 +668,8 @@ class _SCOPeDataExtractor(_DynamicDataset, ABC):
             )
         except FileNotFoundError:
             raise FileNotFoundError(
-                f"File data.pt doesn't exists. "
-                f"Please call 'prepare_data' and/or 'setup' methods to generate the dataset files"
+                "File data.pt doesn't exists. "
+                "Please call 'prepare_data' and/or 'setup' methods to generate the dataset files"
             )
 
         df_scope_version = pd.DataFrame(data_scope_version)
@@ -934,7 +937,6 @@ class SCOPeOver2000(_SCOPeOverX):
 
 
 class SCOPeOver50(_SCOPeOverX):
-
     THRESHOLD = 50
 
 
@@ -949,10 +951,6 @@ class SCOPeOverPartial2000(_SCOPeOverXPartial):
     """
 
     THRESHOLD: int = 2000
-
-
-class SCOPeOver50ESM(SCOPeOver50):
-    READER = ESM2EmbeddingReader
 
 
 if __name__ == "__main__":

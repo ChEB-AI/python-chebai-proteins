@@ -7,19 +7,22 @@
 ## 🔧 Installation
 
 
-To install, follow these steps:
-
-1. Clone the repository:
-```
-git clone https://github.com/ChEB-AI/python-chebai-proteins.git
-```
-
-2. Install the package:
+To install this repository, download [`python-chebai`](https://github.com/ChEB-AI/python-chebai) and this repository, then run
 
 ```
 cd python-chebai
 pip install .
+
+cd python-chebai-proteins
+pip install .
 ```
+
+_Note for developers_: If you want to install the package in editable mode, use the following command instead:
+
+```bash
+pip install -e .
+```
+
 
 ## 🗂 Recommended Folder Structure
 
@@ -43,39 +46,6 @@ This setup enables shared access to data and model configurations.
 
 ## 🚀 Training & Pretraining Guide
 
-### ⚠️ Important Setup Instructions
-
-Before running any training scripts, ensure the environment is correctly configured:
-
-* Either:
-
-  * Install the `python-chebai` repository as a package using:
-
-    ```bash
-    pip install .
-    ```
-* **OR**
-
-  * Manually set the `PYTHONPATH` environment variable if working across multiple directories (`python-chebai` and `python-chebai-proteins`):
-
-    * If your current working directory is `python-chebai-proteins`, set:
-
-      ```bash
-      export PYTHONPATH=path/to/python-chebai
-      ```
-      or vice versa.
-      
-    * If you're working within both repositories simultaneously or facing module not found errors,  we **recommend configuring both directories**:
-
-      ```bash
-      # Linux/macOS
-      export PYTHONPATH=path/to/python-chebai:path/to/python-chebai-proteins
-
-      # Windows (use semicolon instead of colon)
-      set PYTHONPATH=path\to\python-chebai;path\to\python-chebai-proteins
-      ```
-
-> 🔎 See the [PYTHONPATH Explained](#-pythonpath-explained) section below for more details.
 
 
 ### 📊 SCOPE hierarchy prediction
@@ -86,61 +56,3 @@ python -m chebai fit --trainer=../configs/training/default_trainer.yml --trainer
 ```
 
 Same command can be used for **DeepGO** just by changing the config path for data.
-
-
-
-
-
-
-
-## 🧭 PYTHONPATH Explained
-
-### What is `PYTHONPATH`?
-
-`PYTHONPATH` is an environment variable that tells Python where to search for modules that aren't installed via `pip` or not in your current working directory.
-
-### Why You Need It
-
-If your config refers to a custom module like:
-
-```yaml
-class_path: chebai_proteins.preprocessing.datasets.scope.scope.SCOPe50
-```
-
-...and you're running the code from `python-chebai`, Python won't know where to find `chebai_proteins` (from another repo like `python-chebai-proteins/`) unless you add it to `PYTHONPATH`.
-
-
-### How Python Finds Modules
-
-Python looks for imports in this order:
-
-1. Current directory
-2. Standard library
-3. Paths in `PYTHONPATH`
-4. Installed packages (`site-packages`)
-
-You can inspect the full search paths:
-
-```bash
-python -c "import sys; print(sys.path)"
-```
-
-
-
-### ✅ Setting `PYTHONPATH`
-
-#### 🐧 Linux / macOS
-
-```bash
-export PYTHONPATH=/path/to/python-chebai-graph
-echo $PYTHONPATH
-```
-
-#### 🪟 Windows CMD
-
-```cmd
-set PYTHONPATH=C:\path\to\python-chebai-graph
-echo %PYTHONPATH%
-```
-
-> 💡 Note: This is temporary for your terminal session. To make it permanent, add it to your system environment variables.

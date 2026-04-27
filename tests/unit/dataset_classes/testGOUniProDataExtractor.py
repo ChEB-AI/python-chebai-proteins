@@ -37,7 +37,7 @@ class TestGOUniProtDataExtractor(unittest.TestCase):
 
         _GOUniProtDataExtractor.READER = ProteinDataReader
 
-        cls.extractor = _GOUniProtDataExtractor()
+        cls.extractor = _GOUniProtDataExtractor(go_branch="all")
 
     def test_term_callback(self) -> None:
         """

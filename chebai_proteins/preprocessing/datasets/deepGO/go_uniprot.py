@@ -96,37 +96,47 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
     _LABELS_START_IDX: int = 4
 
     _GO_DATA_URL: str = "https://purl.obolibrary.org/obo/go/go-basic.obo"
-    _SWISS_DATA_URL: str = (
-        "https://ftp.uniprot.org/pub/databases/uniprot/knowledgebase/complete/uniprot_sprot.dat.gz"
-    )
+    _SWISS_DATA_URL: str = "https://ftp.uniprot.org/pub/databases/uniprot/knowledgebase/complete/uniprot_sprot.dat.gz"
 
     # Gene Ontology (GO) has three major branches, one for biological processes (BP), molecular functions (MF) and
     # cellular components (CC). The value "all" will take data related to all three branches into account.
+    # TODO: should we be really allowing all branches for single dataset?
     _ALL_GO_BRANCHES: str = "all"
     _GO_BRANCH_NAMESPACE: Dict[str, str] = {
-        "BP": "biological_process",
-        "MF": "molecular_function",
-        "CC": "cellular_component",
+        "BP": "biological_process",  # Huge branch, with 20,000+ GO terms
+        "MF": "molecular_function",  # smaller branch, with 6000+ GO terms
+        "CC": "cellular_component",  # smallest branch, with 2,000+ GO terms
     }
 
-    def __init__(self, **kwargs):
-        self.go_branch: str = self._get_go_branch(**kwargs)
+    READER = None
 
-        self.max_sequence_length: int = int(kwargs.get("max_sequence_length", 1002))
-        assert (
-            self.max_sequence_length >= 1
-        ), "Max sequence length should be greater than or equal to 1."
+    def __init__(
+        self,
+        go_branch: str,
+        max_sequence_len: int = 1002,
+        use_esm2_embeddings: bool = False,
+        **kwargs,
+    ):
+        if bool(use_esm2_embeddings):
+            self.READER = dr.ESM2EmbeddingReader
+
+        self.go_branch: str = self._get_go_branch(go_branch)
+
+        self.max_sequence_length: int = int(max_sequence_len)
+        assert self.max_sequence_length >= 1, (
+            "Max sequence length should be greater than or equal to 1."
+        )
 
         super(_GOUniProtDataExtractor, self).__init__(**kwargs)
 
-        if self.reader.n_gram is not None:
+        if hasattr(self.reader, "n_gram") and self.reader.n_gram is not None:
             assert self.max_sequence_length >= self.reader.n_gram, (
                 f"max_sequence_length ({self.max_sequence_length}) must be greater than "
                 f"or equal to n_gram ({self.reader.n_gram})."
             )
 
     @classmethod
-    def _get_go_branch(cls, **kwargs) -> str:
+    def _get_go_branch(cls, go_branch_value: str, **kwargs) -> str:
         """
         Retrieves the Gene Ontology (GO) branch based on provided keyword arguments.
         This method checks if a valid GO branch value is provided in the keyword arguments.
@@ -141,7 +151,6 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
             ValueError: If the provided 'go_branch' value is not in the allowed list of values.
         """
 
-        go_branch_value = kwargs.get("go_branch", cls._ALL_GO_BRANCHES)
         allowed_values = list(cls._GO_BRANCH_NAMESPACE.keys()) + [cls._ALL_GO_BRANCHES]
         if go_branch_value not in allowed_values:
             raise ValueError(
@@ -181,7 +190,7 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
 
         if not os.path.isfile(go_path):
             print("Missing Gene Ontology raw data")
-            print(f"Downloading Gene Ontology data....")
+            print("Downloading Gene Ontology data....")
             r = requests.get(self._GO_DATA_URL, allow_redirects=True)
             r.raise_for_status()  # Check if the request was successful
             open(go_path, "wb").write(r.content)
@@ -207,7 +216,7 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
         os.makedirs(os.path.dirname(uni_prot_file_path), exist_ok=True)
 
         if not os.path.isfile(uni_prot_file_path):
-            print(f"Downloading Swiss UniProt data....")
+            print("Downloading Swiss UniProt data....")
 
             # Create a temporary file
             with NamedTemporaryFile(delete=False) as tf:
@@ -223,7 +232,7 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
 
             # Unpack the gzipped file
             try:
-                print(f"Unzipping the file....")
+                print("Unzipping the file....")
                 with gzip.open(temp_filename, "rb") as f_in:
                     output_file_path = uni_prot_file_path
                     with open(output_file_path, "wb") as f_out:
@@ -350,6 +359,19 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
         # GO:0046780
         return int(str(go_id).split(":")[1].split("!")[0].strip())
 
+    @abstractmethod
+    def select_classes(self, g: "nx.DiGraph", *args, **kwargs) -> List:
+        """
+        Selects classes from the dataset based on a specified criteria.
+        Args:
+            g (nx.Graph): The graph representing the dataset.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
+        Returns:
+            List: A sorted list of node IDs that meet the specified criteria.
+        """
+        pass
+
     def _graph_to_raw_dataset(self, g: nx.DiGraph) -> pd.DataFrame:
         """
         Processes a directed acyclic graph (DAG) to create a raw dataset in DataFrame format. The dataset includes
@@ -375,7 +397,7 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
         Returns:
             pd.DataFrame: The raw dataset created from the graph.
         """
-        print(f"Processing graph")
+        print("Processing graph")
 
         data_df = self._get_swiss_to_go_mapping()
         # add ancestors to go ids
@@ -457,6 +479,14 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
 
             if not record.sequence or len(record.sequence) > self.max_sequence_length:
                 # Consider protein with only sequence representation and seq. length not greater than max seq. length
+
+                # DeepGO1 paper ignores proteins with sequence length greater than 1002: https://github.com/bio-ontology-research-group/deepgo/blob/master/aaindex.py#L9-L14
+                # But DeepGO2 paper truncates the sequence to 1000: https://github.com/bio-ontology-research-group/deepgo2/blob/main/deepgo/aminoacids.py#L26-L33
+                # Latest Discussion: https://github.com/ChEB-AI/python-chebai/issues/36#issuecomment-2385693976
+                # So, we ignore proteins with sequence length greater than max_sequence_length
+                # The rationale is that with only a partial representation of the protein sequence, the model may not learn effectively.
+                # Also, proteins longer than 1002 are only 3.32% of the total proteins in Swiss-Prot dataset.
+                # https://github.com/ChEB-AI/python-chebai/issues/36#issuecomment-2431460448
                 continue
 
             if any(aa in AMBIGUOUS_AMINO_ACIDS for aa in record.sequence):
@@ -559,8 +589,8 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
             )
         except FileNotFoundError:
             raise FileNotFoundError(
-                f"File data.pt doesn't exists. "
-                f"Please call 'prepare_data' and/or 'setup' methods to generate the dataset files"
+                "File data.pt doesn't exists. "
+                "Please call 'prepare_data' and/or 'setup' methods to generate the dataset files"
             )
 
         df_go_data = pd.DataFrame(data_go)
@@ -586,7 +616,7 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
         Returns:
             str: The path to the base directory, which is "data/GO_UniProt".
         """
-        return os.path.join("data", f"GO_UniProt")
+        return os.path.join("data", "GO_UniProt")
 
     @property
     def raw_file_names_dict(self) -> dict:

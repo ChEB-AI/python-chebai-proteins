@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools >= 77.0.3", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chebai-proteins"
+version = "0.0.2"
+description = "Repository for protein prediction and classification, built on top of the python-chebai codebase"
+authors = []
+readme = "README.md"
+license = { text = "AGPL-3.0" }
+requires-python = ">=3.10, <3.13"
+dependencies = [
+    "chebai[dev] @ git+https://github.com/ChEB-AI/python-chebai.git",
+    "biopython",
+    "fair-esm",
+]
+
+[project.optional-dependencies]
+dev = ["black", "isort", "pre-commit"]
+plot = ["matplotlib", "seaborn"]
+wandb = ["wandb"]
+
+[tool.setuptools]
+include-package-data = true
+license-files = ["LICEN[CS]E*"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+"*" = ["**/*.txt", "**/*.json"]
