@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "chebai-proteins"
 version = "0.0.2"
 description = "Repository for protein prediction and classification, built on top of the python-chebai codebase"
-authors = []
+authors = [""]
 readme = "README.md"
 license = { text = "AGPL-3.0" }
 requires-python = ">=3.10, <3.13"
