@@ -43,6 +43,8 @@ import torch
 import tqdm
 from Bio import SwissProt
 from chebai.preprocessing.datasets.base import _DynamicDataset
+from chebai.preprocessing.datasets.ml_overbagging import _ResampledDynamicDataset, _BootstrapDynamicDataset, _MLROSDynamicDataset
+
 
 from chebai_proteins.preprocessing import reader as dr
 
@@ -756,6 +758,35 @@ class GOUniProtOver50(_GOUniProtOverX):
     """
 
     THRESHOLD: int = 50
+
+
+class GOUniProtOver50REMEDIALReady(GOUniProtOver50):
+
+    def _load_dict(self, input_file_path: str) -> Generator[Dict[str, Any], None, None]:
+        """
+        Don't convert labels to boolean (REMEDIAL needs None values).
+        """
+        with open(input_file_path, "rb") as input_file:
+            df = pd.read_pickle(input_file)
+            for row in df.values:
+                labels = row[self._LABELS_START_IDX :]
+                # chebai.preprocessing.reader.DataReader only needs features, labels, ident, group
+                # "group" set to None, by default as no such entity for this data
+                yield dict(
+                    features=row[self._DATA_REPRESENTATION_IDX],
+                    labels=labels,
+                    ident=row[self._ID_IDX],
+                )
+
+
+class GOUniProtOver50Resampled(_ResampledDynamicDataset, GOUniProtOver50REMEDIALReady):
+    pass
+
+class GOUniProtOver50Boostrapped(_BootstrapDynamicDataset, GOUniProtOver50REMEDIALReady):
+    pass
+
+class GOUniProtOver50MLROS(_MLROSDynamicDataset, GOUniProtOver50REMEDIALReady):
+    pass
 
 
 class _DeepGOMigratedData(_GOUniProtDataExtractor, ABC):
