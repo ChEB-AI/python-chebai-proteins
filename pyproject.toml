@@ -11,7 +11,7 @@ readme = "README.md"
 license = { text = "AGPL-3.0" }
 requires-python = ">=3.10, <3.13"
 dependencies = [
-    "chebai @ git+https://github.com/ChEB-AI/python-chebai.git",
+    "chebai[dev] @ git+https://github.com/ChEB-AI/python-chebai.git",
     "biopython",
     "fair-esm",
 ]
