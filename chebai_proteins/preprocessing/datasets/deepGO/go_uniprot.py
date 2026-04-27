@@ -359,6 +359,19 @@ class _GOUniProtDataExtractor(_DynamicDataset, ABC):
         # GO:0046780
         return int(str(go_id).split(":")[1].split("!")[0].strip())
 
+    @abstractmethod
+    def select_classes(self, g: "nx.DiGraph", *args, **kwargs) -> List:
+        """
+        Selects classes from the dataset based on a specified criteria.
+        Args:
+            g (nx.Graph): The graph representing the dataset.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
+        Returns:
+            List: A sorted list of node IDs that meet the specified criteria.
+        """
+        pass
+
     def _graph_to_raw_dataset(self, g: nx.DiGraph) -> pd.DataFrame:
         """
         Processes a directed acyclic graph (DAG) to create a raw dataset in DataFrame format. The dataset includes
