@@ -780,13 +780,16 @@ class GOUniProtOver50REMEDIALReady(GOUniProtOver50):
 
 
 class GOUniProtOver50Resampled(_ResampledDynamicDataset, GOUniProtOver50REMEDIALReady):
-    pass
+    INTEGER_IDS = False
+
 
 class GOUniProtOver50Boostrapped(_BootstrapDynamicDataset, GOUniProtOver50REMEDIALReady):
-    pass
+    INTEGER_IDS = False
+
 
 class GOUniProtOver50MLROS(_MLROSDynamicDataset, GOUniProtOver50REMEDIALReady):
-    pass
+    INTEGER_IDS = False
+
 
 
 class _DeepGOMigratedData(_GOUniProtDataExtractor, ABC):
@@ -1061,3 +1064,16 @@ class DeepGO2MigratedData(_DeepGOMigratedData):
         if self.use_esm2_embeddings:
             return (dr.ESM2EmbeddingReader.name(),)
         return (self.reader.name(),)
+
+
+if __name__ == "__main__":
+    # Example usage:
+    data = GOUniProtOver50MLROS(
+        go_branch="MF",
+        max_sequence_length=1002,
+        use_esm2_embeddings=False,
+        splits_file_path="data/GO_UniProt/GO50_MF_1002/splits_GO50_MF.csv",
+        take_from_file = "data_resampled.pkl",
+        add_to_file="data_demo.pkl"
+    )
+    data.prepare_data()
