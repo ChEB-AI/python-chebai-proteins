@@ -1068,12 +1068,11 @@ class DeepGO2MigratedData(_DeepGOMigratedData):
 
 if __name__ == "__main__":
     # Example usage:
-    data = GOUniProtOver50MLROS(
+    data = GOUniProtOver50Resampled(
         go_branch="MF",
         max_sequence_length=1002,
-        use_esm2_embeddings=False,
-        splits_file_path="data/GO_UniProt/GO50_MF_1002/splits_GO50_MF.csv",
-        take_from_file = "data_resampled.pkl",
-        add_to_file="data_demo.pkl"
+        use_esm2_embeddings=True,
+        splits_file_path="data/GO_UniProt/GO50_MF_1002/splits_GO50_MF.csv"
     )
     data.prepare_data()
+    data.setup()

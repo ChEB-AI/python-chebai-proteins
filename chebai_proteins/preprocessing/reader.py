@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from urllib.error import HTTPError
 
 import torch
@@ -192,7 +192,40 @@ class ESM2EmbeddingReader(DataReader):
         if self.device:
             self._model = self._model.to(device)
 
+        self.features_dict_path = os.path.join(self.save_model_dir, "embeddings_dict.pkl")
+        if not os.path.isfile(self.features_dict_path):
+            print(f"File {self.features_dict_path} not found. I will generate embeddings from scratch and save them to {self.features_dict_path} for future use (this might take a while)")
+            self.features_dict = {}
+        else:
+            import pickle
+            self.features_dict = pickle.load(open(self.features_dict_path, "rb"))
+
         super().__init__(*args, **kwargs)
+
+    def to_data(self, row: Dict[str, Any]) -> Dict[str, Any]:
+        """Convert raw row data to processed data. Use the features_dict if possible (regenerating embeddings is costly)"""
+        d = self._read_components(row)
+        ident = self._read_id(d["ident"])
+        if ident not in self.features_dict:
+            print(f"Generating ESM2 embedding for ident {ident}.")
+            features = self._readed_data(d["features"])
+            self.features_dict[ident] = features
+        else:
+            features = self.features_dict[ident]
+        
+        return dict(
+            features=features,
+            labels=self._read_label(d["labels"]),
+            ident=ident,
+            group=self._read_group(d["group"]),
+            **d["additional_kwargs"],
+        )
+    
+    def on_finish(self) -> None:
+        """Save the features_dict to a file for future use."""
+        import pickle
+        with open(self.features_dict_path, "wb") as f:
+            pickle.dump(self.features_dict, f)
 
     def load_model_and_alphabet(self) -> Tuple[ESM2, Alphabet]:
         """
@@ -385,15 +418,6 @@ class ESM2EmbeddingReader(DataReader):
             }
         }
         return result["mean_representations"][self.repr_layer]
-
-    def on_finish(self) -> None:
-        """
-        Not used here as no token file exists for this reader.
-
-        Returns:
-            None
-        """
-        pass
 
 
 if __name__ == "__main__":
