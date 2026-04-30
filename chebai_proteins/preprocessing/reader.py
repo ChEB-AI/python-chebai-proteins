@@ -208,7 +208,7 @@ class ESM2EmbeddingReader(DataReader):
         ident = self._read_id(d["ident"])
         if ident not in self.features_dict:
             print(f"Generating ESM2 embedding for ident {ident}.")
-            features = self._readed_data(d["features"])
+            features = self._read_data(d["features"])
             self.features_dict[ident] = features
         else:
             features = self.features_dict[ident]
